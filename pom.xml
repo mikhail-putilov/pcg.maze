@@ -12,6 +12,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <junit.version>4.12</junit.version>
     </properties>
     <developers>
         <developer>
@@ -19,4 +20,12 @@
             <email>m.putilov@innopolis.ru</email>
         </developer>
     </developers>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

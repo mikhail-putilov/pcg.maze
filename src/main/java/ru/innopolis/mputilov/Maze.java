@@ -11,25 +11,24 @@ public class Maze {
     private static final String HORIZONTAL_PATH = "—";
     private static final String EMPTY_HORIZONTAL_PATH = " ";
     private static final String ROOM = "◊";
-    private final int size = 30;
     private final SecureRandom sr;
     private final QuickUnionUF quickUnion;
     private final List<Integer> alreadySeenCells = new ArrayList<>();
     private final Map<Integer, List<Integer>> paths = new HashMap<>();
+    private final int size;
 
     public Maze() {
+        this(30);
+    }
+
+    public Maze(int size) {
+        this.size = size;
         quickUnion = new QuickUnionUF(size * size);
         sr = new SecureRandom();
         alreadySeenCells.add(0);
         for (int i = 0; i < size * size - 1; i++) {
             doIteration();
-//            System.out.println(prettyPrint());
         }
-    }
-
-    public static void main(String[] args) {
-        Maze maze1 = new Maze();
-        System.out.println(maze1.prettyPrint());
     }
 
     private Integer getAnyAlreadySeenCells() {
@@ -43,7 +42,6 @@ public class Maze {
             int neighbor = getAnyNeighbor(randomTarget);
 
             if (!quickUnion.connected(randomTarget, neighbor)) {
-//                System.out.format("target %d neighbor %d\n", randomTarget, neighbor);
                 quickUnion.union(randomTarget, neighbor);
 
                 paths.putIfAbsent(randomTarget, new ArrayList<>());
@@ -85,7 +83,7 @@ public class Maze {
         }
     }
 
-    private String prettyPrint() {
+    public String prettyPrint() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size - 1; i++) {
             appendHorizontalRow(sb, i);
