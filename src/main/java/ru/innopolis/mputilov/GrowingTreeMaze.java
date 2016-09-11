@@ -10,10 +10,10 @@ public class GrowingTreeMaze {
     private static final String HORIZONTAL_PATH = "—";
     private static final String EMPTY_HORIZONTAL_PATH = " ";
     private static final String ROOM = "◊";
+    final List<Integer> activeSet;
+    final boolean[] alreadySeenCells;
+    final Map<Integer, List<Integer>> paths = new HashMap<>();
     private final SecureRandom sr;
-    private final List<Integer> activeSet;
-    private final boolean[] alreadySeenCells;
-    private final Map<Integer, List<Integer>> paths = new HashMap<>();
     private final int size;
 
     public GrowingTreeMaze() {
@@ -32,7 +32,7 @@ public class GrowingTreeMaze {
         }
     }
 
-    private Integer getAnyCellFromActiveSet() {
+    protected Integer getAnyCellFromActiveSet() {
         int i = sr.nextInt(activeSet.size());
         return activeSet.get(i);
     }
@@ -42,7 +42,7 @@ public class GrowingTreeMaze {
         return neighbors.get(i);
     }
 
-    private void doIteration() {
+    protected void doIteration() {
         while (!activeSet.isEmpty()) {
             Integer randomTarget = getAnyCellFromActiveSet();
             List<Integer> unvisitedNeighbors = getUnvisitedNeighbors(randomTarget);
@@ -53,20 +53,12 @@ public class GrowingTreeMaze {
             Integer neighbor = getAnyCellFromNeighbors(unvisitedNeighbors);
             activeSet.add(neighbor);
             alreadySeenCells[neighbor] = true;
-//            int neighbor = getAnyNeighbor(randomTarget);
-//            if (isAlreadySeenCell(neighbor)) {
-//                quickUnion.union(randomTarget, neighbor);
-//
-                paths.putIfAbsent(randomTarget, new ArrayList<>());
-                paths.get(randomTarget).add(neighbor);
-//
-//                alreadySeenCells.add(neighbor);
-//                break;
-//            }
+            paths.putIfAbsent(randomTarget, new ArrayList<>());
+            paths.get(randomTarget).add(neighbor);
         }
     }
 
-    private void removeFromActiveSet(Integer target) {
+    protected void removeFromActiveSet(Integer target) {
         activeSet.remove(target);
     }
 
@@ -74,11 +66,7 @@ public class GrowingTreeMaze {
         return !alreadySeenCells[cell];
     }
 
-    private boolean isAlreadySeenCell(int cell) {
-        return alreadySeenCells[cell];
-    }
-
-    private List<Integer> getUnvisitedNeighbors(int target) {
+    protected List<Integer> getUnvisitedNeighbors(int target) {
         return getNeighbors(target).stream().filter(this::isUnvisitedCell).collect(Collectors.toList());
     }
 
