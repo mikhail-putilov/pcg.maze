@@ -5,7 +5,7 @@ import ru.innopolis.mputilov.union_find.QuickUnionUF;
 import java.security.SecureRandom;
 import java.util.*;
 
-public class Maze {
+public class UnionFindMaze {
     private static final String VERTICAL_PATH = "| ";
     private static final String EMPTY_VERTICAL_PATH = "  ";
     private static final String HORIZONTAL_PATH = "—";
@@ -17,11 +17,11 @@ public class Maze {
     private final Map<Integer, List<Integer>> paths = new HashMap<>();
     private final int size;
 
-    public Maze() {
+    public UnionFindMaze() {
         this(30);
     }
 
-    public Maze(int size) {
+    public UnionFindMaze(int size) {
         this.size = size;
         quickUnion = new QuickUnionUF(size * size);
         sr = new SecureRandom();
