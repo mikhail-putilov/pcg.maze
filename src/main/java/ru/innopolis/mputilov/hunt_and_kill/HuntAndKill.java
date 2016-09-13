@@ -38,7 +38,14 @@ public class HuntAndKill {
         int i = sr.nextInt(size);
         int j = sr.nextInt(size);
         visited[i][j] = true;
-        walk(new Coord(i, j));
+        Coord nextCoord = new Coord(i, j);
+        while (true) {
+            walk(nextCoord);
+            nextCoord = hunt();
+            if (nextCoord == null) {
+                return;
+            }
+        }
     }
 
     private void walk(Coord start) {
@@ -48,15 +55,37 @@ public class HuntAndKill {
             Coord randomNextCoord = getRandomFromList(unvisitedNeighbors);
 
             walkRoutine(currentCoord, randomNextCoord);
-            currentCoord = randomNextCoord;
 
+            currentCoord = randomNextCoord;
             unvisitedNeighbors = getAllUnvisitedNeighbors(randomNextCoord);
         }
+    }
+
+    private Coord hunt() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (visited[i][j]) {
+                    Coord currentCoord = new Coord(i, j);
+                    List<Coord> allUnvisitedNeighbors = getAllUnvisitedNeighbors(currentCoord);
+                    if (!allUnvisitedNeighbors.isEmpty()) {
+                        Coord randomNextCoord = getRandomFromList(allUnvisitedNeighbors);
+                        visited[randomNextCoord.i][randomNextCoord.j] = true;
+                        walkRoutine(currentCoord, randomNextCoord);
+                        return randomNextCoord;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private void walkRoutine(Coord currentCoord, Coord randomNextCoord) {
         visited[randomNextCoord.i][randomNextCoord.j] = true;
 
+        linkTwoCoords(currentCoord, randomNextCoord);
+    }
+
+    private void linkTwoCoords(Coord currentCoord, Coord randomNextCoord) {
         EnumSet<Type> currentType = field[currentCoord.i][currentCoord.j];
         Type directionForCurrentCoord = getDirectionForCurrentCoord(currentCoord, randomNextCoord);
         currentType.add(directionForCurrentCoord);

@@ -8,7 +8,7 @@ import org.junit.Test;
 public class HuntAndKillTest {
     @Test
     public void simpleTest() throws Exception {
-        HuntAndKill huntAndKill = new HuntAndKill(5);
+        HuntAndKill huntAndKill = new HuntAndKill(30);
         System.out.println(huntAndKill.prettyPrint());
 
     }
