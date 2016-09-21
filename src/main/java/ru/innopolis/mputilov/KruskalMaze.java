@@ -4,23 +4,23 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GrowingTreeMaze {
-    public static final String VERTICAL_PATH = "| ";
-    public static final String EMPTY_VERTICAL_PATH = "  ";
-    public static final String HORIZONTAL_PATH = "—";
-    public static final String EMPTY_HORIZONTAL_PATH = " ";
-    public static final String ROOM = "◊";
+public class KruskalMaze {
+    private static final String VERTICAL_PATH = "| ";
+    private static final String EMPTY_VERTICAL_PATH = "  ";
+    private static final String HORIZONTAL_PATH = "—";
+    private static final String EMPTY_HORIZONTAL_PATH = " ";
+    private static final String ROOM = "◊";
     final List<Integer> activeSet;
     final boolean[] alreadySeenCells;
     final Map<Integer, List<Integer>> paths = new HashMap<>();
     private final SecureRandom sr;
     private final int size;
 
-    public GrowingTreeMaze() {
+    public KruskalMaze() {
         this(30);
     }
 
-    public GrowingTreeMaze(int size) {
+    public KruskalMaze(int size) {
         this.size = size;
         alreadySeenCells = new boolean[size * size];
         activeSet = new ArrayList<>();

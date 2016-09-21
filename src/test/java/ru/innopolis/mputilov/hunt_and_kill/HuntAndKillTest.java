@@ -10,6 +10,7 @@ public class HuntAndKillTest {
     public void simpleTest() throws Exception {
         HuntAndKill huntAndKill = new HuntAndKill(30);
         System.out.println(huntAndKill.prettyPrint());
-
+// number dead ends, longest pathes, shortest paths, longest dead end
+//        
     }
 }
