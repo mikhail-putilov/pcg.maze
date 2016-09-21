@@ -12,5 +12,6 @@ public class GrowingTreeMazeTest {
     public void simpleTest() throws Exception {
         GrowingTreeMaze growingTreeMaze = new GrowingTreeMaze(30);
         System.out.println(growingTreeMaze.prettyPrint());
+        System.out.println(growingTreeMaze.countDeadEnds());
     }
 }

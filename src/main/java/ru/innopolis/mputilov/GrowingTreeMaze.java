@@ -20,6 +20,15 @@ public class GrowingTreeMaze {
         this(30);
     }
 
+    public int countDeadEnds() {
+        int counter = 0;
+        for (int i = 0; i < size * size; i++) {
+            if (paths.get(i) != null && paths.get(i).size() == 1) {
+                counter++;
+            }
+        }
+        return counter;
+    }
     public GrowingTreeMaze(int size) {
         this.size = size;
         alreadySeenCells = new boolean[size * size];

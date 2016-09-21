@@ -10,7 +10,8 @@ import static org.junit.Assert.*;
 public class BinaryGrowingTreeMazeTest {
     @Test
     public void simpleTest() throws Exception {
-        BinaryGrowingTreeMaze binaryGrowingTreeMaze = new BinaryGrowingTreeMaze();
+        BinaryGrowingTreeMaze binaryGrowingTreeMaze = new BinaryGrowingTreeMaze(30);
         System.out.println(binaryGrowingTreeMaze.prettyPrint());
+        System.out.println(binaryGrowingTreeMaze.countDeadEnds());
     }
 }

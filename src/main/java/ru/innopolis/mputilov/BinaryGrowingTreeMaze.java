@@ -7,6 +7,14 @@ import java.util.List;
  * Created by mputilov on 11.09.16.
  */
 public class BinaryGrowingTreeMaze extends GrowingTreeMaze {
+    public BinaryGrowingTreeMaze() {
+    }
+
+    public BinaryGrowingTreeMaze(int size) {
+
+        super(size);
+    }
+
     @Override
     protected void doIteration() {
         while (!activeSet.isEmpty()) {
