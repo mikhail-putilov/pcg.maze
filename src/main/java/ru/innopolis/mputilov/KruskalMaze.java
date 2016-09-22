@@ -12,13 +12,20 @@ import static ru.innopolis.mputilov.GrowingTreeMaze.*;
  */
 public class KruskalMaze {
 
-    public static final int SIZE = 10;
+    private final int SIZE;
     private final List<List<EnumSet<State>>> field;
-    private final Iterable<Edge> edges;
-    private Random random = new Random();
+    private int maxDepth = 0;
+    private boolean[][] visited;
 
     public KruskalMaze() {
+        this(30);
+    }
+
+    public KruskalMaze(int size) {
+        SIZE = size;
+        visited = new boolean[SIZE][SIZE];
         EdgeWeightedGraph graph = new EdgeWeightedGraph(SIZE * SIZE);
+        Random random = new Random();
         for (int i = 0; i < SIZE - 1; i++) {
             for (int j = 0; j < SIZE - 1; j++) {
                 double w1 = random.nextDouble();
@@ -37,7 +44,7 @@ public class KruskalMaze {
             graph.addEdge(e3);
         }
         KruskalMST kruskalMST = new KruskalMST(graph);
-        edges = kruskalMST.edges();
+        Iterable<Edge> edges = kruskalMST.edges();
         field = new ArrayList<>(SIZE);
         for (int i = 0; i < SIZE; i++) {
             ArrayList<EnumSet<State>> newList = new ArrayList<>(SIZE);
@@ -117,6 +124,58 @@ public class KruskalMaze {
         return sb.toString();
     }
 
+    public int longestPath() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                countLongestPathFrom(i, j, 0);
+            }
+        }
+        return maxDepth;
+    }
 
-    enum State {RIGHT, BOTTOM}
+    private void countLongestPathFrom(int i, int j, int depth) {
+        visited[i][j] = true;
+        if (depth > maxDepth) {
+            maxDepth = depth;
+        }
+        List<Coord> neighbors = getNeighbors(i, j);
+        for (Coord neighbor : neighbors) {
+            if (!visited[neighbor.row][neighbor.col]) {
+                countLongestPathFrom(neighbor.row, neighbor.col, depth + 1);
+            }
+        }
+    }
+
+    private List<Coord> getNeighbors(int row, int col) {
+        List<Coord> neighbors = new ArrayList<>();
+        //top
+        if (row != 0 && field.get(row - 1).get(col).contains(State.BOTTOM)) {
+            neighbors.add(new Coord(row - 1, col));
+        }
+        //left
+        if (col != 0 && field.get(row).get(col - 1).contains(State.RIGHT)) {
+            neighbors.add(new Coord(row, col - 1));
+        }
+        //bottom
+        if (row < SIZE - 1 && field.get(row).get(col).contains(State.BOTTOM)) {
+            neighbors.add(new Coord(row + 1, col));
+        }
+        //right
+        if (col < SIZE - 1 && field.get(row).get(col).contains(State.RIGHT)) {
+            neighbors.add(new Coord(row, col + 1));
+        }
+        return neighbors;
+    }
+
+    private enum State {RIGHT, BOTTOM}
+
+    private class Coord {
+        int row;
+        int col;
+
+        Coord(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+    }
 }

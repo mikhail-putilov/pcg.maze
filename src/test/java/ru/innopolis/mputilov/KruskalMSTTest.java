@@ -12,6 +12,7 @@ public class KruskalMSTTest {
         KruskalMaze kruskalMaze = new KruskalMaze();
         System.out.println(kruskalMaze.prettyPrint());
         System.out.println(kruskalMaze.countDeadEnds());
+        System.out.println(kruskalMaze.longestPath());
     }
 
 }
