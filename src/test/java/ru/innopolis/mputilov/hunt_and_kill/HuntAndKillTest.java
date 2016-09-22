@@ -11,7 +11,6 @@ public class HuntAndKillTest {
         HuntAndKill huntAndKill = new HuntAndKill(30);
         System.out.println(huntAndKill.prettyPrint());
         System.out.println(huntAndKill.countDeadEnds());
-// number dead ends, longest pathes, shortest paths, longest dead end
-//        
+        // number dead ends, longest pathes, shortest paths, longest dead end
     }
 }
