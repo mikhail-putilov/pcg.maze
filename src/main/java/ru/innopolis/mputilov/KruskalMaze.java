@@ -1,136 +1,122 @@
 package ru.innopolis.mputilov;
 
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Random;
 
+import static ru.innopolis.mputilov.GrowingTreeMaze.*;
+
+/**
+ * Created by mputilov on 21/09/16.
+ */
 public class KruskalMaze {
-    private static final String VERTICAL_PATH = "| ";
-    private static final String EMPTY_VERTICAL_PATH = "  ";
-    private static final String HORIZONTAL_PATH = "—";
-    private static final String EMPTY_HORIZONTAL_PATH = " ";
-    private static final String ROOM = "◊";
-    final List<Integer> activeSet;
-    final boolean[] alreadySeenCells;
-    final Map<Integer, List<Integer>> paths = new HashMap<>();
-    private final SecureRandom sr;
-    private final int size;
+
+    public static final int SIZE = 10;
+    private final List<List<EnumSet<State>>> field;
+    private final Iterable<Edge> edges;
+    private Random random = new Random();
 
     public KruskalMaze() {
-        this(30);
-    }
+        EdgeWeightedGraph graph = new EdgeWeightedGraph(SIZE * SIZE);
+        for (int i = 0; i < SIZE - 1; i++) {
+            for (int j = 0; j < SIZE - 1; j++) {
+                double w1 = random.nextDouble();
+                graph.addEdge(new Edge(getAbsoluteIndex(i, j), getAbsoluteIndex(i + 1, j), w1));
+                double w2 = random.nextDouble();
 
-    public KruskalMaze(int size) {
-        this.size = size;
-        alreadySeenCells = new boolean[size * size];
-        activeSet = new ArrayList<>();
-        activeSet.add(0);
-        alreadySeenCells[0] = true;
-        sr = new SecureRandom();
-        while (!activeSet.isEmpty()) {
-            doIteration();
-        }
-    }
-
-    protected Integer getAnyCellFromActiveSet() {
-        int i = sr.nextInt(activeSet.size());
-        return activeSet.get(i);
-    }
-
-    private Integer getAnyCellFromNeighbors(List<Integer> neighbors) {
-        int i = sr.nextInt(neighbors.size());
-        return neighbors.get(i);
-    }
-
-    protected void doIteration() {
-        while (!activeSet.isEmpty()) {
-            Integer randomTarget = getAnyCellFromActiveSet();
-            List<Integer> unvisitedNeighbors = getUnvisitedNeighbors(randomTarget);
-            if (unvisitedNeighbors.isEmpty()) {
-                removeFromActiveSet(randomTarget);
-                continue;
+                graph.addEdge(new Edge(getAbsoluteIndex(i, j), getAbsoluteIndex(i, j + 1), w2));
             }
-            Integer neighbor = getAnyCellFromNeighbors(unvisitedNeighbors);
-            activeSet.add(neighbor);
-            alreadySeenCells[neighbor] = true;
-            paths.putIfAbsent(randomTarget, new ArrayList<>());
-            paths.get(randomTarget).add(neighbor);
+        }
+        for (int i = 0; i < SIZE - 1; i++) {
+            double w1 = random.nextDouble();
+            double w2 = random.nextDouble();
+            Edge e1 = new Edge(getAbsoluteIndex(i, SIZE - 1), getAbsoluteIndex(i + 1, SIZE - 1), w1);
+            Edge e3 = new Edge(getAbsoluteIndex(SIZE - 1, i), getAbsoluteIndex(SIZE - 1, i + 1), w2);
+            graph.addEdge(e1);
+            graph.addEdge(e3);
+        }
+        KruskalMST kruskalMST = new KruskalMST(graph);
+        edges = kruskalMST.edges();
+        field = new ArrayList<>(SIZE);
+        for (int i = 0; i < SIZE; i++) {
+            ArrayList<EnumSet<State>> newList = new ArrayList<>(SIZE);
+            field.add(newList);
+            for (int j = 0; j < SIZE; j++) {
+                newList.add(EnumSet.noneOf(State.class));
+            }
+        }
+        for (Edge edge : edges) {
+            int a = Math.min(edge.either(), edge.other(edge.either()));
+            int b = Math.max(edge.either(), edge.other(edge.either()));
+            int a_row = a / SIZE;
+            int a_col = a % SIZE;
+            int b_row = b / SIZE;
+            int b_col = b % SIZE;
+            if (a_row == b_row) {
+                int same_row = a_row = b_row;
+                if (a_col + 1 == b_col) {
+                    field.get(same_row).get(a_col).add(State.RIGHT);
+                } else if (b_col + 1 == a_col) {
+                    field.get(same_row).get(b_col).add(State.RIGHT);
+                } else {
+                    throw new RuntimeException();
+                }
+            } else if (a_col == b_col) {
+                int same_col = a_col = b_col;
+                if (a_row + 1 == b_row) {
+                    field.get(a_row).get(same_col).add(State.BOTTOM);
+                } else if (b_row + 1 == a_row) {
+                    field.get(b_row).get(same_col).add(State.BOTTOM);
+                } else {
+                    throw new RuntimeException();
+                }
+            }
         }
     }
 
-    protected void removeFromActiveSet(Integer target) {
-        activeSet.remove(target);
+    public int countDeadEnds() {
+        int counter = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (field.get(i).get(j).size() == 1) {
+                    counter++;
+                }
+            }
+        }
+        return counter;
     }
 
-    private boolean isUnvisitedCell(int cell) {
-        return !alreadySeenCells[cell];
+    private int getAbsoluteIndex(int row, int column) {
+        return SIZE * row + column;
     }
 
-    protected List<Integer> getUnvisitedNeighbors(int target) {
-        return getNeighbors(target).stream().filter(this::isUnvisitedCell).collect(Collectors.toList());
-    }
-
-    private List<Integer> getNeighbors(int target) {
-        List<Integer> neighbors = new ArrayList<>(4);
-        int top = target - size;
-        if (top >= 0) {
-            neighbors.add(top);
-        }
-        int right = target + 1;
-        if (right % size != 0) {
-            neighbors.add(right);
-        }
-        int left = target - 1;
-        if (target % size != 0) {
-            neighbors.add(left);
-        }
-        int bottom = target + size;
-        if (bottom <= size * size - 1) {
-            neighbors.add(bottom);
-        }
-        return neighbors;
-    }
-
-    public String prettyPrint() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size - 1; i++) {
-            appendHorizontalRow(sb, i);
-            appendVerticalPaths(sb, i);
-        }
-        appendHorizontalRow(sb, size - 1);
-        return sb.toString();
-    }
-
-    private void appendVerticalPaths(StringBuilder sb, int row) {
-        for (int column = 0; column < size; column++) {
-            int current = getAbsoluteIndex(row, column);
-            @SuppressWarnings("unchecked")
-            List<Integer> connected = paths.getOrDefault(current, Collections.EMPTY_LIST);
-            int next = getAbsoluteIndex(row + 1, column);
-            @SuppressWarnings("unchecked")
-            List<Integer> connected2 = paths.getOrDefault(next, Collections.EMPTY_LIST);
-
-            sb.append(connected.contains(next) || connected2.contains(current) ? VERTICAL_PATH : EMPTY_VERTICAL_PATH);
+    private void appendVerticalPaths(StringBuilder sb, int row, List<List<EnumSet<State>>> field) {
+        for (int column = 0; column < SIZE; column++) {
+            sb.append(field.get(row).get(column).contains(State.BOTTOM) ? VERTICAL_PATH : EMPTY_VERTICAL_PATH);
         }
         sb.append("\n");
     }
 
-    private void appendHorizontalRow(StringBuilder sb, int row) {
-        for (int column = 0; column < size - 1; column++) {
+    private void appendHorizontalRow(StringBuilder sb, int row, List<List<EnumSet<State>>> field) {
+        for (int column = 0; column < SIZE - 1; column++) {
             sb.append(ROOM);
-            int current = getAbsoluteIndex(row, column);
-            @SuppressWarnings("unchecked")
-            List<Integer> connected = paths.getOrDefault(current, Collections.EMPTY_LIST);
-            int next = getAbsoluteIndex(row, column + 1);
-            @SuppressWarnings("unchecked")
-            List<Integer> connected2 = paths.getOrDefault(next, Collections.EMPTY_LIST);
-            sb.append(connected.contains(next) || connected2.contains(current) ? HORIZONTAL_PATH : EMPTY_HORIZONTAL_PATH);
+            sb.append(field.get(row).get(column).contains(State.RIGHT) ? HORIZONTAL_PATH : EMPTY_HORIZONTAL_PATH);
         }
         sb.append(ROOM);
         sb.append('\n');
     }
 
-    private int getAbsoluteIndex(int row, int column) {
-        return size * row + column;
+    public String prettyPrint() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < SIZE - 1; i++) {
+            appendHorizontalRow(sb, i, field);
+            appendVerticalPaths(sb, i, field);
+        }
+        appendHorizontalRow(sb, SIZE - 1, field);
+        return sb.toString();
     }
+
+
+    enum State {RIGHT, BOTTOM}
 }

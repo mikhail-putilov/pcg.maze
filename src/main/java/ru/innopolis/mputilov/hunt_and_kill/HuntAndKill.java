@@ -135,13 +135,13 @@ public class HuntAndKill {
         if (start.i != 0 && !visited[start.i - 1][start.j]) { //top
             unvisited.add(new Coord(start.i - 1, start.j));
         }
-        if (start.i < size - 1 && !visited[start.i + 1][start.j]) { //bottom
+        if (start.i < size - 1 && !visited[start.i + 1][start.j]) { //BOTTOM
             unvisited.add(new Coord(start.i + 1, start.j));
         }
         if (start.j != 0 && !visited[start.i][start.j - 1]) { //left
             unvisited.add(new Coord(start.i, start.j - 1));
         }
-        if (start.j < size - 1 && !visited[start.i][start.j + 1]) { //right
+        if (start.j < size - 1 && !visited[start.i][start.j + 1]) { //RIGHT
             unvisited.add(new Coord(start.i, start.j + 1));
         }
         return unvisited;
