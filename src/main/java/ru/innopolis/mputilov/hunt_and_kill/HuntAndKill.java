@@ -1,5 +1,7 @@
 package ru.innopolis.mputilov.hunt_and_kill;
 
+import ru.innopolis.mputilov.Coord;
+
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -14,11 +16,13 @@ public class HuntAndKill {
     private static final String HORIZONTAL_PATH = "—";
     private static final String EMPTY_HORIZONTAL_PATH = " ";
     private static final String ROOM = "◊";
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int size;
     private EnumSet<Type>[][] field;
     private boolean[][] visited;
     private SecureRandom sr = new SecureRandom();
-    @SuppressWarnings("FieldCanBeLocal")
-    private int size = 30;
+    private int maxDepth = 0;
+    private boolean[][] visited2;
 
     public HuntAndKill() {
         this(30);
@@ -26,6 +30,7 @@ public class HuntAndKill {
 
     public HuntAndKill(int size) {
         this.size = size;
+        visited2 = new boolean[size][size];
         //noinspection unchecked
         field = new EnumSet[size][size];
         for (int i = 0; i < size; i++) {
@@ -81,7 +86,7 @@ public class HuntAndKill {
                     List<Coord> allUnvisitedNeighbors = getAllUnvisitedNeighbors(currentCoord);
                     if (!allUnvisitedNeighbors.isEmpty()) {
                         Coord randomNextCoord = getRandomFromList(allUnvisitedNeighbors);
-                        visited[randomNextCoord.i][randomNextCoord.j] = true;
+                        visited[randomNextCoord.row][randomNextCoord.col] = true;
                         walkRoutine(currentCoord, randomNextCoord);
                         return randomNextCoord;
                     }
@@ -92,32 +97,32 @@ public class HuntAndKill {
     }
 
     private void walkRoutine(Coord currentCoord, Coord randomNextCoord) {
-        visited[randomNextCoord.i][randomNextCoord.j] = true;
+        visited[randomNextCoord.row][randomNextCoord.col] = true;
 
         linkTwoCoords(currentCoord, randomNextCoord);
     }
 
     private void linkTwoCoords(Coord currentCoord, Coord randomNextCoord) {
-        EnumSet<Type> currentType = field[currentCoord.i][currentCoord.j];
+        EnumSet<Type> currentType = field[currentCoord.row][currentCoord.col];
         Type directionForCurrentCoord = getDirectionForCurrentCoord(currentCoord, randomNextCoord);
         currentType.add(directionForCurrentCoord);
-        EnumSet<Type> randomNextCoordType = field[randomNextCoord.i][randomNextCoord.j];
+        EnumSet<Type> randomNextCoordType = field[randomNextCoord.row][randomNextCoord.col];
         randomNextCoordType.add(directionForCurrentCoord.getOpposite());
     }
 
     private Type getDirectionForCurrentCoord(Coord currentCoord, Coord randomNextCoord) {
-        if (currentCoord.i == randomNextCoord.i) {
-            if (currentCoord.j < randomNextCoord.j) {
+        if (currentCoord.row == randomNextCoord.row) {
+            if (currentCoord.col < randomNextCoord.col) {
                 return Type.RIGHT_CONNECTED;
-            } else if (currentCoord.j > randomNextCoord.j) {
+            } else if (currentCoord.col > randomNextCoord.col) {
                 return Type.LEFT_CONNECTED;
             } else {
                 throw new RuntimeException("");
             }
-        } else if (currentCoord.j == randomNextCoord.j) {
-            if (currentCoord.i < randomNextCoord.i) {
+        } else if (currentCoord.col == randomNextCoord.col) {
+            if (currentCoord.row < randomNextCoord.row) {
                 return Type.BOTTOM_CONNECTED;
-            } else if (currentCoord.i > randomNextCoord.i) {
+            } else if (currentCoord.row > randomNextCoord.row) {
                 return Type.TOP_CONNECTED;
             } else {
                 throw new RuntimeException("");
@@ -132,17 +137,17 @@ public class HuntAndKill {
 
     private List<Coord> getAllUnvisitedNeighbors(Coord start) {
         List<Coord> unvisited = new ArrayList<>();
-        if (start.i != 0 && !visited[start.i - 1][start.j]) { //top
-            unvisited.add(new Coord(start.i - 1, start.j));
+        if (start.row != 0 && !visited[start.row - 1][start.col]) { //top
+            unvisited.add(new Coord(start.row - 1, start.col));
         }
-        if (start.i < size - 1 && !visited[start.i + 1][start.j]) { //BOTTOM
-            unvisited.add(new Coord(start.i + 1, start.j));
+        if (start.row < size - 1 && !visited[start.row + 1][start.col]) { //BOTTOM
+            unvisited.add(new Coord(start.row + 1, start.col));
         }
-        if (start.j != 0 && !visited[start.i][start.j - 1]) { //left
-            unvisited.add(new Coord(start.i, start.j - 1));
+        if (start.col != 0 && !visited[start.row][start.col - 1]) { //left
+            unvisited.add(new Coord(start.row, start.col - 1));
         }
-        if (start.j < size - 1 && !visited[start.i][start.j + 1]) { //RIGHT
-            unvisited.add(new Coord(start.i, start.j + 1));
+        if (start.col < size - 1 && !visited[start.row][start.col + 1]) { //RIGHT
+            unvisited.add(new Coord(start.row, start.col + 1));
         }
         return unvisited;
     }
@@ -174,6 +179,51 @@ public class HuntAndKill {
         sb.append('\n');
     }
 
+    public int longestPath() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                countLongestPathFrom(i, j, 0);
+                visited2 = new boolean[size][size];
+            }
+        }
+        return maxDepth;
+    }
+
+    private void countLongestPathFrom(int i, int j, int depth) {
+        visited2[i][j] = true;
+        if (depth > maxDepth) {
+            maxDepth = depth;
+        }
+        List<Coord> neighbors = getNeighbors(i, j);
+        for (Coord neighbor : neighbors) {
+            if (!visited2[neighbor.row][neighbor.col]) {
+                countLongestPathFrom(neighbor.row, neighbor.col, depth + 1);
+            }
+        }
+    }
+
+    private List<Coord> getNeighbors(int row, int col) {
+        List<Coord> neighbors = new ArrayList<>();
+        //top
+        if (row != 0 && (field[row - 1][col].contains(Type.BOTTOM_CONNECTED) || field[row][col].contains(Type.TOP_CONNECTED))) {
+            neighbors.add(new Coord(row - 1, col));
+        }
+        //left
+        if (col != 0 && (field[row][col - 1].contains(Type.RIGHT_CONNECTED) || field[row][col].contains(Type.LEFT_CONNECTED))) {
+            neighbors.add(new Coord(row, col - 1));
+        }
+        //bottom
+        if (row < size - 1 && (field[row][col].contains(Type.BOTTOM_CONNECTED) || field[row + 1][col].contains(Type.TOP_CONNECTED))) {
+            neighbors.add(new Coord(row + 1, col));
+        }
+        //right
+        if (col < size - 1 && (field[row][col].contains(Type.RIGHT_CONNECTED) || field[row][col + 1].contains(Type.LEFT_CONNECTED))) {
+            neighbors.add(new Coord(row, col + 1));
+        }
+        return neighbors;
+    }
+
+
     private enum Type {
         LEFT_CONNECTED, RIGHT_CONNECTED, BOTTOM_CONNECTED, TOP_CONNECTED;
 
@@ -190,16 +240,6 @@ public class HuntAndKill {
                 default:
                     throw new RuntimeException("");
             }
-        }
-    }
-
-    private static class Coord {
-        int i;
-        int j;
-
-        Coord(int i, int j) {
-            this.i = i;
-            this.j = j;
         }
     }
 }
