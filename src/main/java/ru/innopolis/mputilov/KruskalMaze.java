@@ -12,7 +12,7 @@ import static ru.innopolis.mputilov.GrowingTreeMaze.*;
  */
 public class KruskalMaze {
 
-    private final int SIZE;
+    private final int size;
     private final List<List<EnumSet<State>>> field;
     private int maxDepth = 0;
     private boolean[][] visited;
@@ -22,12 +22,12 @@ public class KruskalMaze {
     }
 
     public KruskalMaze(int size) {
-        SIZE = size;
-        visited = new boolean[SIZE][SIZE];
-        EdgeWeightedGraph graph = new EdgeWeightedGraph(SIZE * SIZE);
+        this.size = size;
+        visited = new boolean[this.size][this.size];
+        EdgeWeightedGraph graph = new EdgeWeightedGraph(this.size * this.size);
         Random random = new Random();
-        for (int i = 0; i < SIZE - 1; i++) {
-            for (int j = 0; j < SIZE - 1; j++) {
+        for (int i = 0; i < this.size - 1; i++) {
+            for (int j = 0; j < this.size - 1; j++) {
                 double w1 = random.nextDouble();
                 graph.addEdge(new Edge(getAbsoluteIndex(i, j), getAbsoluteIndex(i + 1, j), w1));
                 double w2 = random.nextDouble();
@@ -35,31 +35,31 @@ public class KruskalMaze {
                 graph.addEdge(new Edge(getAbsoluteIndex(i, j), getAbsoluteIndex(i, j + 1), w2));
             }
         }
-        for (int i = 0; i < SIZE - 1; i++) {
+        for (int i = 0; i < this.size - 1; i++) {
             double w1 = random.nextDouble();
             double w2 = random.nextDouble();
-            Edge e1 = new Edge(getAbsoluteIndex(i, SIZE - 1), getAbsoluteIndex(i + 1, SIZE - 1), w1);
-            Edge e3 = new Edge(getAbsoluteIndex(SIZE - 1, i), getAbsoluteIndex(SIZE - 1, i + 1), w2);
+            Edge e1 = new Edge(getAbsoluteIndex(i, this.size - 1), getAbsoluteIndex(i + 1, this.size - 1), w1);
+            Edge e3 = new Edge(getAbsoluteIndex(this.size - 1, i), getAbsoluteIndex(this.size - 1, i + 1), w2);
             graph.addEdge(e1);
             graph.addEdge(e3);
         }
         KruskalMST kruskalMST = new KruskalMST(graph);
         Iterable<Edge> edges = kruskalMST.edges();
-        field = new ArrayList<>(SIZE);
-        for (int i = 0; i < SIZE; i++) {
-            ArrayList<EnumSet<State>> newList = new ArrayList<>(SIZE);
+        field = new ArrayList<>(this.size);
+        for (int i = 0; i < this.size; i++) {
+            ArrayList<EnumSet<State>> newList = new ArrayList<>(this.size);
             field.add(newList);
-            for (int j = 0; j < SIZE; j++) {
+            for (int j = 0; j < this.size; j++) {
                 newList.add(EnumSet.noneOf(State.class));
             }
         }
         for (Edge edge : edges) {
             int a = Math.min(edge.either(), edge.other(edge.either()));
             int b = Math.max(edge.either(), edge.other(edge.either()));
-            int a_row = a / SIZE;
-            int a_col = a % SIZE;
-            int b_row = b / SIZE;
-            int b_col = b % SIZE;
+            int a_row = a / this.size;
+            int a_col = a % this.size;
+            int b_row = b / this.size;
+            int b_col = b % this.size;
             if (a_row == b_row) {
                 int same_row = a_row = b_row;
                 if (a_col + 1 == b_col) {
@@ -84,8 +84,8 @@ public class KruskalMaze {
 
     public int countDeadEnds() {
         int counter = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 if (field.get(i).get(j).size() == 1) {
                     counter++;
                 }
@@ -95,18 +95,18 @@ public class KruskalMaze {
     }
 
     private int getAbsoluteIndex(int row, int column) {
-        return SIZE * row + column;
+        return size * row + column;
     }
 
     private void appendVerticalPaths(StringBuilder sb, int row, List<List<EnumSet<State>>> field) {
-        for (int column = 0; column < SIZE; column++) {
+        for (int column = 0; column < size; column++) {
             sb.append(field.get(row).get(column).contains(State.BOTTOM) ? VERTICAL_PATH : EMPTY_VERTICAL_PATH);
         }
         sb.append("\n");
     }
 
     private void appendHorizontalRow(StringBuilder sb, int row, List<List<EnumSet<State>>> field) {
-        for (int column = 0; column < SIZE - 1; column++) {
+        for (int column = 0; column < size - 1; column++) {
             sb.append(ROOM);
             sb.append(field.get(row).get(column).contains(State.RIGHT) ? HORIZONTAL_PATH : EMPTY_HORIZONTAL_PATH);
         }
@@ -116,17 +116,17 @@ public class KruskalMaze {
 
     public String prettyPrint() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < SIZE - 1; i++) {
+        for (int i = 0; i < size - 1; i++) {
             appendHorizontalRow(sb, i, field);
             appendVerticalPaths(sb, i, field);
         }
-        appendHorizontalRow(sb, SIZE - 1, field);
+        appendHorizontalRow(sb, size - 1, field);
         return sb.toString();
     }
 
     public int longestPath() {
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 countLongestPathFrom(i, j, 0);
             }
         }
@@ -157,11 +157,11 @@ public class KruskalMaze {
             neighbors.add(new Coord(row, col - 1));
         }
         //bottom
-        if (row < SIZE - 1 && field.get(row).get(col).contains(State.BOTTOM)) {
+        if (row < size - 1 && field.get(row).get(col).contains(State.BOTTOM)) {
             neighbors.add(new Coord(row + 1, col));
         }
         //right
-        if (col < SIZE - 1 && field.get(row).get(col).contains(State.RIGHT)) {
+        if (col < size - 1 && field.get(row).get(col).contains(State.RIGHT)) {
             neighbors.add(new Coord(row, col + 1));
         }
         return neighbors;
