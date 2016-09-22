@@ -9,7 +9,7 @@ public class KruskalMSTTest {
 
     @Test
     public void name() throws Exception {
-        KruskalMaze kruskalMaze = new KruskalMaze();
+        KruskalMaze kruskalMaze = new KruskalMaze(3);
         System.out.println(kruskalMaze.prettyPrint());
         System.out.println(kruskalMaze.countDeadEnds());
         System.out.println(kruskalMaze.longestPath());

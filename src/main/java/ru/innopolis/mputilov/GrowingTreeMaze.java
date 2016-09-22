@@ -15,9 +15,44 @@ public class GrowingTreeMaze {
     final Map<Integer, List<Integer>> paths = new HashMap<>();
     private final SecureRandom sr;
     private final int size;
+    private int maxDepth = 0;
+    private boolean[] visited;
 
     public GrowingTreeMaze() {
         this(30);
+    }
+
+    public GrowingTreeMaze(int size) {
+        this.size = size;
+        visited = new boolean[size * size];
+        alreadySeenCells = new boolean[size * size];
+        activeSet = new ArrayList<>();
+        activeSet.add(0);
+        alreadySeenCells[0] = true;
+        sr = new SecureRandom();
+        while (!activeSet.isEmpty()) {
+            doIteration();
+        }
+    }
+
+    public int longestPath() {
+        for (int i = 0; i < size*size; i++) {
+            countLongestPathFrom(i, 0);
+        }
+        return maxDepth;
+    }
+
+    private void countLongestPathFrom(int room, int depth) {
+        visited[room] = true;
+        if (depth > maxDepth) {
+            maxDepth = depth;
+        }
+        List<Integer> neighbors = getNeighbors(room);
+        for (Integer neighbor : neighbors) {
+            if (!visited[neighbor]) {
+                countLongestPathFrom(neighbor, depth + 1);
+            }
+        }
     }
 
     public int countDeadEnds() {
@@ -28,17 +63,6 @@ public class GrowingTreeMaze {
             }
         }
         return counter;
-    }
-    public GrowingTreeMaze(int size) {
-        this.size = size;
-        alreadySeenCells = new boolean[size * size];
-        activeSet = new ArrayList<>();
-        activeSet.add(0);
-        alreadySeenCells[0] = true;
-        sr = new SecureRandom();
-        while (!activeSet.isEmpty()) {
-            doIteration();
-        }
     }
 
     protected Integer getAnyCellFromActiveSet() {
@@ -63,7 +87,9 @@ public class GrowingTreeMaze {
             activeSet.add(neighbor);
             alreadySeenCells[neighbor] = true;
             paths.putIfAbsent(randomTarget, new ArrayList<>());
+            paths.putIfAbsent(neighbor, new ArrayList<>());
             paths.get(randomTarget).add(neighbor);
+            paths.get(neighbor).add(randomTarget);
         }
     }
 

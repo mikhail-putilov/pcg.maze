@@ -10,8 +10,9 @@ import static org.junit.Assert.*;
 public class GrowingTreeMazeTest {
     @Test
     public void simpleTest() throws Exception {
-        GrowingTreeMaze growingTreeMaze = new GrowingTreeMaze(30);
+        GrowingTreeMaze growingTreeMaze = new GrowingTreeMaze(3);
         System.out.println(growingTreeMaze.prettyPrint());
         System.out.println(growingTreeMaze.countDeadEnds());
+        System.out.println(growingTreeMaze.longestPath());
     }
 }

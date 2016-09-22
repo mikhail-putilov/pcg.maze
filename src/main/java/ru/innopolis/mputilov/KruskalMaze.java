@@ -168,14 +168,4 @@ public class KruskalMaze {
     }
 
     private enum State {RIGHT, BOTTOM}
-
-    private class Coord {
-        int row;
-        int col;
-
-        Coord(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
-    }
 }
