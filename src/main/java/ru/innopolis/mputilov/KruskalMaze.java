@@ -128,6 +128,7 @@ public class KruskalMaze {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 countLongestPathFrom(i, j, 0);
+                visited = new boolean[size][size];
             }
         }
         return maxDepth;

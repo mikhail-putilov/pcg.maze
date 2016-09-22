@@ -38,6 +38,7 @@ public class GrowingTreeMaze {
     public int longestPath() {
         for (int i = 0; i < size*size; i++) {
             countLongestPathFrom(i, 0);
+            visited = new boolean[size*size];
         }
         return maxDepth;
     }
