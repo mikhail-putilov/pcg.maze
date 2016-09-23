@@ -8,10 +8,11 @@ import org.junit.Test;
 public class HuntAndKillTest {
     @Test
     public void simpleTest() throws Exception {
-        HuntAndKill huntAndKill = new HuntAndKill(3);
+        HuntAndKill huntAndKill = new HuntAndKill(10);
         System.out.println(huntAndKill.prettyPrint());
         System.out.println(huntAndKill.countDeadEnds());
         System.out.println(huntAndKill.longestPath());
+        System.out.println(huntAndKill.generateTikz());
         // number dead ends, longest pathes, shortest paths, longest dead end
     }
 }

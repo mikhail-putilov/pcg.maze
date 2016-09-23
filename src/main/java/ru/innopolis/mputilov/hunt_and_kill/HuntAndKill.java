@@ -152,6 +152,16 @@ public class HuntAndKill {
         return unvisited;
     }
 
+    public String generateTikz() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size - 1; i++) {
+            appendTikzHorizontalRow(sb, i);
+            appendTikzVerticalPaths(sb, i);
+        }
+        appendTikzHorizontalRow(sb, size - 1);
+        return sb.toString();
+    }
+
     public String prettyPrint() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size - 1; i++) {
@@ -170,6 +180,17 @@ public class HuntAndKill {
         sb.append("\n");
     }
 
+    private void appendTikzVerticalPaths(StringBuilder sb, int row) {
+        for (int column = 0; column < size; column++) {
+            EnumSet<Type> types = field[row][column];
+            sb.append(types.contains(Type.BOTTOM_CONNECTED) ? getLineFromTo(row, column, row + 1, column) : "");
+        }
+    }
+
+    private String getLineFromTo(int rowFrom, int colFrom, int rowTo, int colTo) {
+        return String.format("\\draw[thick,gray] (m-%d-%d) -- (m-%d-%d);\n", rowFrom+1, colFrom+1, rowTo+1, colTo+1);
+    }
+
     private void appendHorizontalRow(StringBuilder sb, int row) {
         for (int column = 0; column < size - 1; column++) {
             sb.append(ROOM);
@@ -177,6 +198,12 @@ public class HuntAndKill {
         }
         sb.append(ROOM);
         sb.append('\n');
+    }
+
+    private void appendTikzHorizontalRow(StringBuilder sb, int row) {
+        for (int column = 0; column < size - 1; column++) {
+            sb.append(field[row][column].contains(Type.RIGHT_CONNECTED) ? getLineFromTo(row, column, row, column + 1) : "");
+        }
     }
 
     public int longestPath() {
