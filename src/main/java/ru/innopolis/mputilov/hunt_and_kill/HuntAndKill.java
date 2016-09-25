@@ -187,8 +187,8 @@ public class HuntAndKill {
         }
     }
 
-    private String getLineFromTo(int rowFrom, int colFrom, int rowTo, int colTo) {
-        return String.format("\\draw[thick,gray] (m-%d-%d) -- (m-%d-%d);\n", rowFrom+1, colFrom+1, rowTo+1, colTo+1);
+    public static String getLineFromTo(int rowFrom, int colFrom, int rowTo, int colTo) {
+        return String.format("\\draw[thick, double] (%d,%d) -- (%d,%d);\n", rowFrom+1, colFrom+1, rowTo+1, colTo+1);
     }
 
     private void appendHorizontalRow(StringBuilder sb, int row) {

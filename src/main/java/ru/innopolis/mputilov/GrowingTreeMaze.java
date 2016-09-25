@@ -4,6 +4,8 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.innopolis.mputilov.hunt_and_kill.HuntAndKill.getLineFromTo;
+
 public class GrowingTreeMaze {
     public static final String VERTICAL_PATH = "| ";
     public static final String EMPTY_VERTICAL_PATH = "  ";
@@ -36,9 +38,9 @@ public class GrowingTreeMaze {
     }
 
     public int longestPath() {
-        for (int i = 0; i < size*size; i++) {
+        for (int i = 0; i < size * size; i++) {
             countLongestPathFrom(i, 0);
-            visited = new boolean[size*size];
+            visited = new boolean[size * size];
         }
         return maxDepth;
     }
@@ -50,7 +52,7 @@ public class GrowingTreeMaze {
         }
         List<Integer> neighbors = getNeighbors(room);
         for (Integer neighbor : neighbors) {
-            if (!visited[neighbor]) {
+            if (!visited[neighbor] && paths.getOrDefault(room, Collections.emptyList()).contains(neighbor)) {
                 countLongestPathFrom(neighbor, depth + 1);
             }
         }
@@ -137,6 +139,16 @@ public class GrowingTreeMaze {
         return sb.toString();
     }
 
+    public String generateTikz() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size - 1; i++) {
+            appendTikzHorizontalRow(sb, i);
+            appendTikzVerticalPaths(sb, i);
+        }
+        appendTikzHorizontalRow(sb, size - 1);
+        return sb.toString();
+    }
+
     private void appendVerticalPaths(StringBuilder sb, int row) {
         for (int column = 0; column < size; column++) {
             int current = getAbsoluteIndex(row, column);
@@ -149,6 +161,31 @@ public class GrowingTreeMaze {
             sb.append(connected.contains(next) || connected2.contains(current) ? VERTICAL_PATH : EMPTY_VERTICAL_PATH);
         }
         sb.append("\n");
+    }
+
+    private void appendTikzVerticalPaths(StringBuilder sb, int row) {
+        for (int column = 0; column < size; column++) {
+            int current = getAbsoluteIndex(row, column);
+            @SuppressWarnings("unchecked")
+            List<Integer> connected = paths.getOrDefault(current, Collections.EMPTY_LIST);
+            int next = getAbsoluteIndex(row + 1, column);
+            @SuppressWarnings("unchecked")
+            List<Integer> connected2 = paths.getOrDefault(next, Collections.EMPTY_LIST);
+
+            sb.append(connected.contains(next) || connected2.contains(current) ? getLineFromTo(row, column, row + 1, column) : "");
+        }
+    }
+
+    private void appendTikzHorizontalRow(StringBuilder sb, int row) {
+        for (int column = 0; column < size - 1; column++) {
+            int current = getAbsoluteIndex(row, column);
+            @SuppressWarnings("unchecked")
+            List<Integer> connected = paths.getOrDefault(current, Collections.EMPTY_LIST);
+            int next = getAbsoluteIndex(row, column + 1);
+            @SuppressWarnings("unchecked")
+            List<Integer> connected2 = paths.getOrDefault(next, Collections.EMPTY_LIST);
+            sb.append(connected.contains(next) || connected2.contains(current) ? getLineFromTo(row, column, row, column + 1) : "");
+        }
     }
 
     private void appendHorizontalRow(StringBuilder sb, int row) {

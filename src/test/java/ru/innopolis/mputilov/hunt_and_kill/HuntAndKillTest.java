@@ -1,6 +1,9 @@
 package ru.innopolis.mputilov.hunt_and_kill;
 
 import org.junit.Test;
+import ru.innopolis.mputilov.GrowingTreeMaze;
+
+import java.io.PrintWriter;
 
 /**
  * Created by mputilov on 13.09.16.
@@ -8,11 +11,18 @@ import org.junit.Test;
 public class HuntAndKillTest {
     @Test
     public void simpleTest() throws Exception {
-        HuntAndKill huntAndKill = new HuntAndKill(10);
-        System.out.println(huntAndKill.prettyPrint());
-        System.out.println(huntAndKill.countDeadEnds());
-        System.out.println(huntAndKill.longestPath());
-        System.out.println(huntAndKill.generateTikz());
-        // number dead ends, longest pathes, shortest paths, longest dead end
+        int i1 = 1000;
+        try (PrintWriter deadEnds = new PrintWriter("dead_ends.hunt.and.kill.txt", "UTF-8")) {
+            try (PrintWriter longestPath = new PrintWriter("longest_path.hunt.and.kill.txt", "UTF-8")) {
+                for (int i = 0; i < i1; i++) {
+                    HuntAndKill maze = new HuntAndKill(20);
+//            System.out.println(kruskalMaze.prettyPrint());
+//            System.out.println(kruskalMaze.countDeadEnds());
+//            System.out.println(kruskalMaze.longestPath());
+                    deadEnds.println(maze.countDeadEnds());
+                    longestPath.println(maze.longestPath());
+                }
+            }
+        }
     }
 }

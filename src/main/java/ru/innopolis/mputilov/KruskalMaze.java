@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import static ru.innopolis.mputilov.GrowingTreeMaze.*;
+import static ru.innopolis.mputilov.hunt_and_kill.HuntAndKill.getLineFromTo;
 
 /**
  * Created by mputilov on 21/09/16.
@@ -166,6 +167,28 @@ public class KruskalMaze {
             neighbors.add(new Coord(row, col + 1));
         }
         return neighbors;
+    }
+
+    public String generateTikz() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size - 1; i++) {
+            appendTikzHorizontalRow(sb, i, field);
+            appendTikzVerticalPaths(sb, i, field);
+        }
+        appendTikzHorizontalRow(sb, size - 1, field);
+        return sb.toString();
+    }
+
+    private void appendTikzVerticalPaths(StringBuilder sb, int row, List<List<EnumSet<State>>> field) {
+        for (int column = 0; column < size; column++) {
+            sb.append(field.get(row).get(column).contains(State.BOTTOM) ? getLineFromTo(row, column, row + 1, column) : "");
+        }
+    }
+
+    private void appendTikzHorizontalRow(StringBuilder sb, int row, List<List<EnumSet<State>>> field) {
+        for (int column = 0; column < size - 1; column++) {
+            sb.append(field.get(row).get(column).contains(State.RIGHT) ? getLineFromTo(row, column, row, column + 1) : "");
+        }
     }
 
     private enum State {RIGHT, BOTTOM}
