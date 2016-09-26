@@ -1,7 +1,9 @@
 package ru.innopolis.mputilov.hunt_and_kill;
 
 import org.junit.Test;
+import ru.innopolis.mputilov.BinaryGrowingTreeMaze;
 import ru.innopolis.mputilov.GrowingTreeMaze;
+import ru.innopolis.mputilov.KruskalMaze;
 
 import java.io.PrintWriter;
 
@@ -24,5 +26,12 @@ public class HuntAndKillTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void presentation() throws Exception {
+        KruskalMaze maze = new KruskalMaze(50);
+        System.out.println(maze.generateTikz());
+
     }
 }
